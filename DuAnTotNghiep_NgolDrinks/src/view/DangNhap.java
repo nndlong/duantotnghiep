@@ -12,6 +12,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 /**
  *
  * @author Admin
@@ -99,22 +102,43 @@ public class DangNhap extends javax.swing.JFrame {
     }
 
     private void dangNhap() {
-        String email = txtEmail.getText();
-        String matKhau = new String(txtMatKhau.getPassword());
+                        String email = txtEmail.getText();
+                String password = new String(txtMatKhau.getPassword());
 
-        TaiKhoan taiKhoan = TaiKhoanDAO.kiemTraDangNhap(email, matKhau);
-        if (taiKhoan != null) {
-            if (taiKhoan.getEmail().equalsIgnoreCase("admin@gmail.com")) {
-                JOptionPane.showMessageDialog(this, "Đăng nhập thành công (Admin)");
-                // Mở Admin Dashboard
-            } else {
-                JOptionPane.showMessageDialog(this, "Đăng nhập thành công (User)");
-                // Mở User Dashboard
+                if (email.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                try (Connection conn = DBConnection.getConnect()) {
+                    String sql = "SELECT Mataikhoan, Manguoidung FROM Taikhoan WHERE Email = ? AND Matkhau = ?";
+                    PreparedStatement stm = conn.prepareStatement(sql);
+                    stm.setString(1, email);
+                    stm.setString(2, password);
+                    ResultSet rs = stm.executeQuery();
+
+                    if (rs.next()) {
+                        int userId = rs.getInt("Mataikhoan");
+                        int nguoidungId = rs.getInt("Manguoidung");
+
+                        if (email.equals("admin@gmail.com")) { // Kiểm tra nếu là admin
+                            JOptionPane.showMessageDialog(null, "Đăng nhập thành công (Admin)");
+                            new trangchuadmin(email).setVisible(true); // Mở giao diện admin
+                        } else {
+                            trangchu homePage = new trangchu(email); // Truyền email để đồng bộ tài khoản
+                            homePage.setVisible(true);
+                            new thongbaodn().setVisible(true);
+                        }
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Sai tài khoản hoặc mật khẩu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Lỗi kết nối!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
             }
-        } else {
-            JOptionPane.showMessageDialog(this, "Sai email hoặc mật khẩu!");
-        }
-    }
+        });
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

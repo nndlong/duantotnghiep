@@ -19,7 +19,7 @@ public class NguoiDungDAO {
         String sql = "SELECT * FROM Nguoidung n JOIN Taikhoan t ON n.Manguoidung = t.Manguoidung " +
                      "WHERE t.Email = ? AND n.Hoten = ? AND n.SDT = ?";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getConnect();
              PreparedStatement pst = conn.prepareStatement(sql)) {
 
             pst.setString(1, email);

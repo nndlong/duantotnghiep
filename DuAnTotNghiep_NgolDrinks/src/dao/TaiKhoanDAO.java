@@ -20,7 +20,7 @@ public class TaiKhoanDAO {
         TaiKhoan tk = null;
         String sql = "SELECT * FROM Taikhoan WHERE Email = ? AND Matkhau = ?";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getConnect();
              PreparedStatement pst = conn.prepareStatement(sql)) {
 
             pst.setString(1, email);
@@ -43,7 +43,7 @@ public class TaiKhoanDAO {
     // Hàm cập nhật mật khẩu
     public static boolean capNhatMatKhau(String email, String matKhauMoi) {
         String sql = "UPDATE Taikhoan SET Matkhau = ? WHERE Email = ?";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getConnect();
              PreparedStatement pst = conn.prepareStatement(sql)) {
 
             pst.setString(1, matKhauMoi);

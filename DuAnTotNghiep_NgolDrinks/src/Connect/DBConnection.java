@@ -1,35 +1,40 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Connect;
+import java.sql.*; // chỉ cho nhanh & lười
+import java.util.ArrayList;
+import java.util.List;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-/**
- *
- * @author Admin
- */
 public class DBConnection {
-    private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=NgolDrinks;encrypt=true;trustServerCertificate=true";
-    private static final String USERNAME = "sa"; // user SQL Server
-    private static final String PASSWORD = "123456789"; // password SQL Server
+    static String connectionUrl = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=NgolDrinks;user=sa;password=123456789;trustServerCertificate=true";
+    
+public static Connection getConnect() throws Exception {
+        return DriverManager.getConnection(connectionUrl);
+    }
 
-    public static Connection getConnection() {
-        Connection conn = null;
+    public static Object executeQuery(String query, List<Object> params) {
         try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            System.out.println("Kết nối SQL Server thành công!");
-        } catch (ClassNotFoundException e) {
-            System.out.println("Không tìm thấy Driver JDBC!");
-            e.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("Lỗi kết nối SQL: " + e.getMessage());
+            Connection conn = getConnect();
+            PreparedStatement stm = conn.prepareStatement(query);
+            // Truyền các params vào trong statement
+            // số lượng dấu ? = số lượng phần tử của params
+            for (int i = 0; i < params.size(); i++) { // truyền từng phần tử
+                stm.setObject(i + 1, params.get(i)); // truyền giá trị
+            }
+            // Thực thi statement
+            if (query.trim().toLowerCase().startsWith("select")) {
+                ResultSet rs = stm.executeQuery();
+                return rs; // trả về resultSet với câu lệnh select
+            } else {
+                int row = stm.executeUpdate(); // chạy và trả về số dòng bị tác động (row affected)
+                System.out.println("Bạn đã " + query.split(" ")[0] + " " + row + " bản ghi");
+                // query.split(" ") sẽ cắt chuỗi thành 1 mảng theo dấu cách " ", lúc này mỗi phần tử là 1 từ
+                // query.split(" ")[0] sẽ chính là loại truy vấn
+                if(row > 0) return true;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return conn;
+        return false;
     }
+
+
 }
