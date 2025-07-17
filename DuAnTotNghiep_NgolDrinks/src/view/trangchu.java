@@ -23,14 +23,14 @@ public class trangchu extends javax.swing.JFrame {
     }
 
     private void initUI() {
-        setTitle("Hệ Thống Đặt Đồ Ăn Isekai");
+        setTitle("Hệ Thống Đặt Đồ Uống Ngol Drinks");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(new BorderLayout());
 
         // Màu sắc
-        Color backgroundColor = new Color(40, 40, 40);
-        Color sidebarColor = new Color(30, 30, 30);
+        Color backgroundColor = new Color(30, 20, 40);
+        Color sidebarColor = new Color(10, 10, 20);
         Color textColor = Color.WHITE;
 
         // Sidebar

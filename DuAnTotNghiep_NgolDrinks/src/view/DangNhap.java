@@ -123,11 +123,11 @@ public class DangNhap extends javax.swing.JFrame {
 
                         if (email.equals("admin@gmail.com")) { // Kiểm tra nếu là admin
                             JOptionPane.showMessageDialog(null, "Đăng nhập thành công (Admin)");
-                            new trangchuadmin(email).setVisible(true); // Mở giao diện admin
+//                            new trangchuadmin(email).setVisible(true); // Mở giao diện admin
                         } else {
                             trangchu homePage = new trangchu(email); // Truyền email để đồng bộ tài khoản
                             homePage.setVisible(true);
-                            new thongbaodn().setVisible(true);
+//                            new thongbaodn().setVisible(true);
                         }
                         dispose();
                     } else {
@@ -138,7 +138,7 @@ public class DangNhap extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Lỗi kết nối!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        });
+        
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
