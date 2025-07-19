@@ -20,14 +20,13 @@ import java.sql.ResultSet;
  * @author Admin
  */
 public class DangNhap extends javax.swing.JFrame {
-
     /**
      * Creates new form DangNhap
      */
     private JTextField txtEmail;
     private JPasswordField txtMatKhau;
     private JButton btnDangNhap, btnQuenMatKhau;
-
+    
     public DangNhap() {
         setTitle("NgolDrinks - Đăng nhập");
         setSize(500, 350);
@@ -122,12 +121,14 @@ public class DangNhap extends javax.swing.JFrame {
                 if (email.equalsIgnoreCase("admin@gmail.com")) {
                     JOptionPane.showMessageDialog(null, "Đăng nhập thành công (Admin)");
                     new AdminForm().setVisible(true);
+       
                 } else {
                     // ✅ Người dùng thường
                     JOptionPane.showMessageDialog(null, "Đăng nhập thành công (User)");
-                    new Home().setVisible(true); // hoặc UserForm bạn thiết kế
+                    new UserForm().setVisible(true); // hoặc UserForm bạn thiết kế
                 }
                 dispose(); // Đóng form đăng nhập
+            
             } else {
                 JOptionPane.showMessageDialog(null, "Sai tài khoản hoặc mật khẩu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }

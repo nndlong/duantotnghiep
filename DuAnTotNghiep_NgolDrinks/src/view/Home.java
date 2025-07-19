@@ -27,12 +27,6 @@ public class Home extends javax.swing.JPanel {
 
         // Khởi tạo danh sách ảnh
         images = new ArrayList<>();
-        images.add(new ImageIcon(getClass().getResource("/images/yfnOhvIRQTWXggitFmpBWA.jfif"))); // Thay đổi đường dẫn ảnh
-        images.add(new ImageIcon(getClass().getResource("/images/NuxikQBcTOGp4YNEriEIpw.jpg"))); // Thay đổi đường dẫn ảnh
-        images.add(new ImageIcon(getClass().getResource("/images/UEgFPqSMSJGMNHTF-LSyvA.jfif"))); // Thay đổi đường dẫn ảnh
-        images.add(new ImageIcon(getClass().getResource("/images/sm-hqK0IRGWJ7apX1i51ug.jfif"))); // Thay đổi đường dẫn ảnh
-        images.add(new ImageIcon(getClass().getResource("/images/ZqWQRHLMRWWcuWjpH39KsA.jfif"))); // Thay đổi đường dẫn ảnh
-        images.add(new ImageIcon(getClass().getResource("/images/Qqkq1TGETs-6VI_hVTI8Ng.jfif"))); // Thay đổi đường dẫn ảnh
         images.add(new ImageIcon(getClass().getResource("/images/BRVN7Nk-RkCEYJEmEC0Bhg.jfif"))); // Thay đổi đường dẫn ảnh
 
         // Label để hiển thị ảnh lớn
