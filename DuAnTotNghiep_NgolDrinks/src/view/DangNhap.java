@@ -26,6 +26,7 @@ public class DangNhap extends javax.swing.JFrame {
     private JTextField txtEmail;
     private JPasswordField txtMatKhau;
     private JButton btnDangNhap, btnQuenMatKhau;
+    public static String emailDangNhap;
     
     public DangNhap() {
         setTitle("NgolDrinks - Đăng nhập");
@@ -117,6 +118,7 @@ public class DangNhap extends javax.swing.JFrame {
             ResultSet rs = stm.executeQuery();
 
             if (rs.next()) {
+                DangNhap.emailDangNhap = email;
                 // ✅ Nếu là admin
                 if (email.equalsIgnoreCase("admin@gmail.com")) {
                     JOptionPane.showMessageDialog(null, "Đăng nhập thành công (Admin)");

@@ -62,7 +62,7 @@ public class UserForm extends javax.swing.JFrame {
         btnTaoDon.addActionListener(e -> showPanel(new DonHangPanel()));
         btnDonDaLam.addActionListener(e -> showPanel(new DonHoanThanhPanel()));
         btnBanAn.addActionListener(e -> showPanel(new ChuyenDoiBan()));
-        btnThongTinTaiKhoan.addActionListener(e -> showPanel(new KhuyenMaiPanel()));
+        btnThongTinTaiKhoan.addActionListener(e -> showPanel(new ThongTinPanel(DangNhap.emailDangNhap)));
 
         // 🔥 Xử lý đăng xuất
         btnDangXuat.addActionListener(e -> {
