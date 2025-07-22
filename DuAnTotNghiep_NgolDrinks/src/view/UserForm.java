@@ -19,7 +19,7 @@ public class UserForm extends javax.swing.JFrame {
     private JPanel sidebarPanel, contentPanel;
 
     public UserForm() {
-        setTitle("NgolDrinks - Admin");
+        setTitle("NgolDrinks - User");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 650);
         setLocationRelativeTo(null);
@@ -56,12 +56,12 @@ public class UserForm extends javax.swing.JFrame {
         add(contentPanel, BorderLayout.CENTER);
 
         // Default show panel
-        showPanel(new TaiKhoanPanel());
+        showPanel(new DonHangPanel());
 
         // Menu button actions
-        btnTaoDon.addActionListener(e -> showPanel(new TaiKhoanPanel()));
-        btnDonDaLam.addActionListener(e -> showPanel(new DoUongPanel()));
-        btnBanAn.addActionListener(e -> showPanel(new QuanLyDonPanel()));
+        btnTaoDon.addActionListener(e -> showPanel(new DonHangPanel()));
+        btnDonDaLam.addActionListener(e -> showPanel(new DonHoanThanhPanel()));
+        btnBanAn.addActionListener(e -> showPanel(new ChuyenDoiBan()));
         btnThongTinTaiKhoan.addActionListener(e -> showPanel(new KhuyenMaiPanel()));
 
         // 🔥 Xử lý đăng xuất

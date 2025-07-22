@@ -7,21 +7,20 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-
+    
 public class PosterFrame extends javax.swing.JFrame {
-
-    private JLabel lblPoster, lblClick;
+private JLabel lblPoster, lblClick;
     private String[] imagePaths = {
         "/images/1.png",
         "/images/2.png",
         "/images/3.png"
     };
-
+       
     private int currentIndex = 0;
     private Timer imageTimer;
-
+    
     public PosterFrame() {
-        setTitle("Poster NgolDrinks");
+                setTitle("Poster NgolDrinks");
         setSize(800, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -59,19 +58,15 @@ public class PosterFrame extends javax.swing.JFrame {
         });
     }
 
-private void updateImage() {
-    String path = imagePaths[currentIndex];
-    java.net.URL imgUrl = getClass().getResource(path);
-    if (imgUrl == null) {
-        System.out.println("❌ Không tìm thấy ảnh tại: " + path);
-    } else {
-        System.out.println("✅ Đã load ảnh: " + path);
-        ImageIcon icon = new ImageIcon(imgUrl);
+ private void updateImage() {
+    try {
+        ImageIcon icon = new ImageIcon(getClass().getResource(imagePaths[currentIndex]));
         Image img = icon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
         lblPoster.setIcon(new ImageIcon(img));
+    } catch (Exception e) {
+        System.out.println("Không tìm thấy ảnh: " + imagePaths[currentIndex]);
     }
 }
-
 
 
     /**
@@ -103,7 +98,7 @@ private void updateImage() {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-
+        
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -128,7 +123,7 @@ private void updateImage() {
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
-        //</editor-fold>\ơ
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
