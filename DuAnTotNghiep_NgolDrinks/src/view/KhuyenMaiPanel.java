@@ -28,25 +28,25 @@ public class KhuyenMaiPanel extends javax.swing.JPanel {
     public KhuyenMaiPanel() {
         setLayout(new BorderLayout());
 
-        // 🟢 Table
+        // 🟦 Table
         model = new DefaultTableModel(new String[]{"Mã giảm giá", "Tỉ lệ giảm (%)", "Ngày tạo"}, 0);
         table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
 
-        // 🟢 Form input
+        // 🟦 Form input
         JPanel form = new JPanel(new GridLayout(2, 2, 10, 10));
         form.setBorder(BorderFactory.createTitledBorder("Thông tin khuyến mãi"));
 
         form.add(new JLabel("Mã giảm giá (ID):"));
         txtMagiamgia = new JTextField();
-        txtMagiamgia.setEnabled(false); // 🔒 Không cho nhập, chỉ hiển thị
+        txtMagiamgia.setEnabled(false); // ❌ Không cho nhập
         form.add(txtMagiamgia);
 
         form.add(new JLabel("Tỉ lệ giảm (%):"));
         txtTileGiam = new JTextField();
         form.add(txtTileGiam);
 
-        // 🟢 Buttons
+        // 🟦 Buttons
         JPanel buttons = new JPanel(new FlowLayout());
         btnThem = new JButton("Thêm");
         btnSua = new JButton("Sửa");
@@ -62,16 +62,16 @@ public class KhuyenMaiPanel extends javax.swing.JPanel {
         add(form, BorderLayout.NORTH);
         add(buttons, BorderLayout.SOUTH);
 
-        // 🟢 Load data khi mở panel
+        // 🟦 Load data khi mở panel
         loadData();
 
-        // 🟢 Sự kiện các nút
+        // 🟦 Sự kiện các nút
         btnThem.addActionListener(e -> them());
         btnSua.addActionListener(e -> sua());
         btnXoa.addActionListener(e -> xoa());
         btnTaiLai.addActionListener(e -> loadData());
 
-        // 🟢 Khi click table → set dữ liệu lên form
+        // 🟦 Khi click table → set dữ liệu lên form
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int row = table.getSelectedRow();
@@ -81,7 +81,7 @@ public class KhuyenMaiPanel extends javax.swing.JPanel {
         });
     }
 
-    // 🟢 Load data
+    // 🟦 Load data
     private void loadData() {
         model.setRowCount(0);
         try (Connection conn = DBConnection.getConnect()) {
@@ -100,8 +100,25 @@ public class KhuyenMaiPanel extends javax.swing.JPanel {
         }
     }
 
-    // 🟢 Thêm
+    // 🟦 Validate tỉ lệ giảm
+    private boolean validateTileGiam() {
+        try {
+            int tile = Integer.parseInt(txtTileGiam.getText());
+            if (tile < 1 || tile > 99) {
+                JOptionPane.showMessageDialog(this, "Tỉ lệ giảm phải từ 1% đến 99%!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return false;
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Tỉ lệ giảm phải là số!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+    }
+
+    // 🟦 Thêm
     private void them() {
+        if (!validateTileGiam()) return; // ✅ Validate trước khi thêm
+
         try (Connection conn = DBConnection.getConnect()) {
             String sql = "INSERT INTO Giamgia (Tilegiam) VALUES (?)";
             PreparedStatement pst = conn.prepareStatement(sql);
@@ -116,12 +133,14 @@ public class KhuyenMaiPanel extends javax.swing.JPanel {
         }
     }
 
-    // 🟢 Sửa (hỏi xác nhận)
+    // 🟦 Sửa (hỏi xác nhận)
     private void sua() {
         if (txtMagiamgia.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn khuyến mãi để sửa!");
             return;
         }
+
+        if (!validateTileGiam()) return; // ✅ Validate trước khi sửa
 
         int confirm = JOptionPane.showConfirmDialog(
             this,
@@ -148,7 +167,7 @@ public class KhuyenMaiPanel extends javax.swing.JPanel {
         }
     }
 
-    // 🟢 Xóa (hỏi xác nhận)
+    // 🟦 Xóa (hỏi xác nhận)
     private void xoa() {
         if (txtMagiamgia.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn khuyến mãi để xóa!");
