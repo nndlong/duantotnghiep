@@ -11,11 +11,9 @@ import java.awt.*;
  *
  * @author Admin
  */
-public class UserForm extends javax.swing.JFrame {
 
-    /**
-     * Creates new form AdminForm
-     */
+public class UserForm extends JFrame {
+
     private JPanel sidebarPanel, contentPanel;
 
     public UserForm() {
@@ -27,26 +25,32 @@ public class UserForm extends javax.swing.JFrame {
 
         // Sidebar menu
         sidebarPanel = new JPanel();
-        sidebarPanel.setLayout(new GridLayout(6, 1, 5, 5)); // 5 menu + 1 nút đăng xuất
-        sidebarPanel.setBackground(new Color(34, 40, 49)); // Màu nền sidebar
+        sidebarPanel.setLayout(new GridLayout(6, 1, 5, 5));
+        sidebarPanel.setBackground(new Color(34, 40, 49));
 
+        // Các nút menu
         JButton btnTaoDon = new JButton("Tạo đơn");
         JButton btnDonDaLam = new JButton("Đơn đã làm");
+        JButton btnDonHangCho = new JButton("Đơn hàng chờ"); // ✅ Thêm mới
         JButton btnBanAn = new JButton("Bàn ăn");
         JButton btnThongTinTaiKhoan = new JButton("Thông tin tài khoản");
-        JButton btnDangXuat = new JButton("Đăng xuất"); // 🔥 Nút đăng xuất
+        JButton btnDangXuat = new JButton("Đăng xuất");
 
+        // Style cho các nút
         styleButton(btnTaoDon);
         styleButton(btnDonDaLam);
+        styleButton(btnDonHangCho);
         styleButton(btnBanAn);
         styleButton(btnThongTinTaiKhoan);
         styleButton(btnDangXuat);
 
+        // Thêm nút vào sidebar
         sidebarPanel.add(btnTaoDon);
-        sidebarPanel.add(btnDonDaLam);
+        sidebarPanel.add(btnDonHangCho);
+        sidebarPanel.add(btnDonDaLam); // ✅ Thêm vào sidebar
         sidebarPanel.add(btnBanAn);
         sidebarPanel.add(btnThongTinTaiKhoan);
-        sidebarPanel.add(btnDangXuat); // Thêm nút đăng xuất vào cuối
+        sidebarPanel.add(btnDangXuat);
 
         // Content panel
         contentPanel = new JPanel(new BorderLayout());
@@ -55,16 +59,17 @@ public class UserForm extends javax.swing.JFrame {
         add(sidebarPanel, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
-        // Default show panel
+        // Hiển thị panel mặc định
         showPanel(new DonHangPanel());
 
-        // Menu button actions
+        // Sự kiện nút
         btnTaoDon.addActionListener(e -> showPanel(new DonHangPanel()));
         btnDonDaLam.addActionListener(e -> showPanel(new DonHoanThanhPanel()));
+        btnDonHangCho.addActionListener(e -> showPanel(new DonHangChoPanel())); // ✅ Gắn panel chờ
         btnBanAn.addActionListener(e -> showPanel(new ChuyenDoiBan()));
         btnThongTinTaiKhoan.addActionListener(e -> showPanel(new ThongTinPanel(DangNhap.emailDangNhap)));
 
-        // 🔥 Xử lý đăng xuất
+        // Đăng xuất
         btnDangXuat.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(
                 this,
@@ -73,8 +78,8 @@ public class UserForm extends javax.swing.JFrame {
                 JOptionPane.YES_NO_OPTION
             );
             if (confirm == JOptionPane.YES_OPTION) {
-                dispose(); // Đóng AdminForm
-                new DangNhap().setVisible(true); // Quay về form đăng nhập
+                dispose();
+                new DangNhap().setVisible(true);
             }
         });
     }

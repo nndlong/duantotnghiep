@@ -4,6 +4,7 @@
  */
 package view;
 
+import Connect.DBConnection;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,56 +14,84 @@ import java.sql.*;
 
 public class DonHoanThanhPanel extends JPanel {
 
-   private JTable table;
+    private JTable table;
     private DefaultTableModel model;
     private JButton btnThanhToan;
+    private JComboBox<String> cboTrangThai;
 
     public DonHoanThanhPanel() {
-    setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
-        // Tạo model bảng
+        // Bảng dữ liệu
         model = new DefaultTableModel();
         model.addColumn("Mã Đơn Hàng");
         model.addColumn("Ngày đặt hàng");
-        model.addColumn("Mã đơn hàng chờ");
+        model.addColumn("Mã Đơn Hàng Chờ");
         model.addColumn("Trạng thái");
+        model.addColumn("Tổng tiền");
 
-        // Tạo bảng
         table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Nút Thanh Toán
+        // Nút + Combobox lọc
         btnThanhToan = new JButton("Thanh toán");
+        cboTrangThai = new JComboBox<>(new String[]{"Tất cả", "Chờ", "Đã Thanh Toán"});
         JPanel bottomPanel = new JPanel();
+        bottomPanel.add(new JLabel("Lọc theo trạng thái:"));
+        bottomPanel.add(cboTrangThai);
         bottomPanel.add(btnThanhToan);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Load dữ liệu
-        loadData();
+        // Load dữ liệu lần đầu
+        loadData("Tất cả");
 
-        // Xử lý thanh toán
+        // Sự kiện
         btnThanhToan.addActionListener(e -> xuLyThanhToan());
+        cboTrangThai.addActionListener(e -> loadData((String) cboTrangThai.getSelectedItem()));
+
+        // Xem chi tiết đơn hàng
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    int madon = (int) model.getValueAt(table.getSelectedRow(), 0);
+                    hienThiChiTietDon(madon);
+                }
+            }
+        });
     }
 
-    private void loadData() {
-        model.setRowCount(0); // clear dữ liệu cũ
+    private void loadData(String trangThaiLoc) {
+        model.setRowCount(0);
+        try (Connection conn = DBConnection.getConnect()) {
+            String sql = "SELECT d.Madonhang, d.Ngaydathang, d.MadonhangCho, d.Trangthai, " +
+                         "(SELECT SUM(CT.Soluong * CT.Giaban) FROM Chitietdonhang CT WHERE CT.Madonhang = d.Madonhang) AS TongTien " +
+                         "FROM Donhang d";
 
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:sqlserver://localhost:1433;databaseName=NgolDrinks;user=sa;password=123456789;encrypt=false")) {
+            if (!"Tất cả".equalsIgnoreCase(trangThaiLoc)) {
+                sql += " WHERE Trangthai = ?";
+            }
 
-            String sql = "SELECT Madonhang, Ngaydathang, MadonhangCho, Trangthai FROM Donhang";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            if (!"Tất cả".equalsIgnoreCase(trangThaiLoc)) {
+                stmt.setString(1, trangThaiLoc);
+            }
 
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Object[] row = {
-                        rs.getInt("Madonhang"),
-                        rs.getDate("Ngaydathang"),
-                        rs.getInt("MadonhangCho"),
-                        rs.getString("Trangthai")
-                };
-                model.addRow(row);
+                int madon = rs.getInt("Madonhang");
+                Date ngay = rs.getDate("Ngaydathang");
+                int madoncho = rs.getObject("MadonhangCho") != null ? rs.getInt("MadonhangCho") : 0;
+                String trangthai = rs.getString("Trangthai");
+                double tong = rs.getObject("TongTien") != null ? rs.getDouble("TongTien") : 0;
+
+                model.addRow(new Object[]{
+                        madon,
+                        ngay,
+                        madoncho == 0 ? "Không có" : madoncho,
+                        trangthai,
+                        String.format("%,.0f", tong) + " đ"
+                });
             }
 
         } catch (Exception ex) {
@@ -78,35 +107,67 @@ public class DonHoanThanhPanel extends JPanel {
             return;
         }
 
-        int madon = (int) model.getValueAt(selectedRow, 0);
+        String trangthai = (String) model.getValueAt(selectedRow, 3);
+        if ("Đã Thanh Toán".equalsIgnoreCase(trangthai)) {
+            JOptionPane.showMessageDialog(this, "Đơn hàng này đã thanh toán rồi.");
+            return;
+        }
 
+        int madon = (int) model.getValueAt(selectedRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Bạn chắc chắn muốn thanh toán đơn hàng này?",
-                "Xác nhận thanh toán",
-                JOptionPane.YES_NO_OPTION);
+                "Xác nhận", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            try (Connection conn = DriverManager.getConnection(
-                    "jdbc:sqlserver://localhost:1433;databaseName=NgolDrinks;user=sa;password=123456789;encrypt=false")) {
-
+            try (Connection conn = DBConnection.getConnect()) {
                 String sql = "UPDATE Donhang SET Trangthai = N'Đã Thanh Toán' WHERE Madonhang = ?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, madon);
                 int rows = stmt.executeUpdate();
-
                 if (rows > 0) {
                     JOptionPane.showMessageDialog(this, "Thanh toán thành công!");
-                    loadData(); // cập nhật lại bảng
+                    loadData((String) cboTrangThai.getSelectedItem());
                 } else {
                     JOptionPane.showMessageDialog(this, "Không thể cập nhật trạng thái.");
                 }
-
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật đơn hàng.");
             }
         }
-}
+    }
+
+    private void hienThiChiTietDon(int madonhang) {
+        DefaultTableModel detailModel = new DefaultTableModel(new Object[]{
+                "Tên đồ uống", "Số lượng", "Giá bán", "Thành tiền"
+        }, 0);
+
+        try (Connection conn = DBConnection.getConnect()) {
+            String sql = "SELECT d.Tendouong, c.Soluong, c.Giaban, (c.Soluong * c.Giaban) as Thanhtien " +
+                         "FROM Chitietdonhang c JOIN Douong d ON c.Madouong = d.Madouong " +
+                         "WHERE c.Madonhang = ?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setInt(1, madonhang);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                detailModel.addRow(new Object[]{
+                        rs.getString("Tendouong"),
+                        rs.getInt("Soluong"),
+                        rs.getDouble("Giaban"),
+                        rs.getDouble("Thanhtien")
+                });
+            }
+
+            JTable tbl = new JTable(detailModel);
+            JScrollPane scroll = new JScrollPane(tbl);
+            scroll.setPreferredSize(new Dimension(500, 300));
+            JOptionPane.showMessageDialog(this, scroll, "Chi tiết đơn hàng #" + madonhang, JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi hiển thị chi tiết đơn hàng.");
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
